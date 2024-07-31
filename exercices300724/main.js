@@ -209,9 +209,10 @@
 // }
 // getAverageByClass(grades);
 
+
 // Générer un nombre mystère aléatoire entre 0 et 100
-// Générer un nombre mystère aléatoire entre 0 et 100
-let nombreMystere = Math.floor(Math.random() * 101);
+// Il faut remplacer par 101 mais j'ai mis 6 pour la phase de test
+let nombreMystere = Math.floor(Math.random() * 6);
 let essais = 0;
 let maxEssais = 5;
 let nbPartiesGagnees = 0;
@@ -219,32 +220,74 @@ let nbPartiesGagnees = 0;
 // Vérifier si nbPartiesGagnees est déjà stocké dans le localStorage
 if (localStorage.getItem('nbPartiesGagnees')) {
     nbPartiesGagnees = parseInt(localStorage.getItem('nbPartiesGagnees'), 10);
+    if (isNaN(nbPartiesGagnees)) {
+        nbPartiesGagnees = 0;
+    }
 } else {
     localStorage.setItem('nbPartiesGagnees', 0);
 }
 
-while (essais < maxEssais) {
-    let nombreSaisi = parseInt(prompt("Entrez un nombre entier entre 0 et 100 pour deviner le nombre mystère"));
+function lancerPartie() {
+    nombreMystere = Math.floor(Math.random() * 6); // 6 pour les tests, 101 pour la version finale
+    essais = 0;
+    let partieActive = true;
 
-    if (isNaN(nombreSaisi) || nombreSaisi < 0 || nombreSaisi > 100) {
-        console.log("Votre nombre n'est pas compris entre 0 et 100.");
-    } else if (nombreSaisi === nombreMystere) {
-        console.log("BRAVO !!! Vous avez trouvé le nombre mystère.");
-        nbPartiesGagnees += 1;
-        localStorage.setItem('nbPartiesGagnees', nbPartiesGagnees);
-        console.log(`Vous avez gagné ${nbPartiesGagnees} fois.`);
-        break;
-    } else if (Math.abs(nombreMystere - nombreSaisi) <= 10) { 
-        console.log("Vous êtes proche !");
-    } else if (nombreSaisi < nombreMystere) {
-        console.log("Perdu, c'est plus grand. Essayez encore.");
-    } else if (nombreSaisi > nombreMystere) {
-        console.log("Perdu, c'est plus petit. Essayez encore.");
+    while (essais < maxEssais && partieActive) {
+        let nombreSaisi = prompt("Entrez un nombre entier entre 0 et 100 pour deviner le nombre mystère ou 'pause' pour mettre en pause.");
+
+        if (nombreSaisi === 'pause') {
+            alert("Jeu en pause. Vous pouvez reprendre plus tard.");
+            partieActive = false;
+        } else {
+            nombreSaisi = parseInt(nombreSaisi);
+
+            if (isNaN(nombreSaisi) || nombreSaisi < 0 || nombreSaisi > 100) {
+                alert("Votre nombre n'est pas compris entre 0 et 100.");
+            } else if (nombreSaisi === nombreMystere) {
+                alert("BRAVO !!! Vous avez trouvé le nombre mystère.");
+                nbPartiesGagnees += 1;
+                localStorage.setItem('nbPartiesGagnees', nbPartiesGagnees);
+                alert(`Vous avez gagné ${nbPartiesGagnees} fois.`);
+                break;
+            } else if (Math.abs(nombreMystere - nombreSaisi) <= 1) { 
+                alert("Vous êtes proche !");
+            } else if (nombreSaisi < nombreMystere) {
+                alert("Perdu, c'est plus grand. Essayez encore.");
+            } else if (nombreSaisi > nombreMystere) {
+                alert("Perdu, c'est plus petit. Essayez encore.");
+            }
+
+            essais++;
+        }
     }
 
-    essais++;
+    if (essais === maxEssais) {
+        alert(`Désolé, vous avez épuisé vos essais. Le nombre mystère était ${nombreMystere}.`);
+    }
 }
 
-if (essais === maxEssais) {
-    console.log(`Désolé, vous avez épuisé vos essais. Le nombre mystère était ${nombreMystere}.`);
+function afficherScore() {
+    alert(`Vous avez gagné ${nbPartiesGagnees} fois.`);
 }
+
+function menuPrincipal() {
+    let choix = prompt("Entrez '1' pour lancer une nouvelle partie, '2' pour afficher le score, ou '3' pour quitter.");
+
+    switch (choix) {
+        case '1':
+            lancerPartie();
+            break;
+        case '2':
+            afficherScore();
+            break;
+        case '3':
+            alert("Au revoir !");
+            break;
+        default:
+            alert("Choix invalide.");
+            menuPrincipal();
+            break;
+    }
+}
+
+menuPrincipal();
